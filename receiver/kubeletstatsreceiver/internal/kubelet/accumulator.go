@@ -17,6 +17,7 @@ package kubelet // import "github.com/open-telemetry/opentelemetry-collector-con
 import (
 	"time"
 
+	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver/internal/metadata"
 	"go.opentelemetry.io/collector/model/pdata"
 	"go.uber.org/zap"
 	stats "k8s.io/kubelet/pkg/apis/stats/v1alpha1"
@@ -47,6 +48,7 @@ type metricDataAccumulator struct {
 	metricGroupsToCollect map[MetricGroup]bool
 	time                  time.Time
 	typeStr               string
+	mb                    *metadata.MetricsBuilder
 }
 
 const (

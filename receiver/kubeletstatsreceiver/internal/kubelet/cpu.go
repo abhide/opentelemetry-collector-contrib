@@ -17,30 +17,30 @@ package kubelet // import "github.com/open-telemetry/opentelemetry-collector-con
 import (
 	"go.opentelemetry.io/collector/model/pdata"
 	stats "k8s.io/kubelet/pkg/apis/stats/v1alpha1"
-
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver/internal/metadata"
 )
 
-func addCPUMetrics(dest pdata.MetricSlice, prefix string, s *stats.CPUStats, startTime pdata.Timestamp, currentTime pdata.Timestamp) {
+func (a *metricDataAccumulator) addCPUMetrics(dest pdata.MetricSlice, prefix string, s *stats.CPUStats, startTime pdata.Timestamp, currentTime pdata.Timestamp) {
 	if s == nil {
 		return
 	}
-	addCPUUsageMetric(dest, prefix, s, currentTime)
-	addCPUTimeMetric(dest, prefix, s, startTime, currentTime)
+	a.addCPUUsageMetric(dest, prefix, s, currentTime)
+	a.addCPUTimeMetric(dest, prefix, s, startTime, currentTime)
 }
 
-func addCPUUsageMetric(dest pdata.MetricSlice, prefix string, s *stats.CPUStats, currentTime pdata.Timestamp) {
+func (a *metricDataAccumulator) addCPUUsageMetric(dest pdata.MetricSlice, prefix string, s *stats.CPUStats, currentTime pdata.Timestamp) {
 	if s.UsageNanoCores == nil {
 		return
 	}
 	value := float64(*s.UsageNanoCores) / 1_000_000_000
-	fillDoubleGauge(dest.AppendEmpty(), prefix, metadata.M.CPUUtilization, value, currentTime)
+	//fillDoubleGauge(dest.AppendEmpty(), prefix, metadata.M.CPUUtilization, value, currentTime)
+	a.mb.RecordCPUUtilizationDataPoint(currentTime, value)
 }
 
-func addCPUTimeMetric(dest pdata.MetricSlice, prefix string, s *stats.CPUStats, startTime pdata.Timestamp, currentTime pdata.Timestamp) {
+func (a *metricDataAccumulator) addCPUTimeMetric(dest pdata.MetricSlice, prefix string, s *stats.CPUStats, startTime pdata.Timestamp, currentTime pdata.Timestamp) {
 	if s.UsageCoreNanoSeconds == nil {
 		return
 	}
 	value := float64(*s.UsageCoreNanoSeconds) / 1_000_000_000
-	fillDoubleSum(dest.AppendEmpty(), prefix, metadata.M.CPUTime, value, startTime, currentTime)
+	//fillDoubleSum(dest.AppendEmpty(), prefix, metadata.M.CPUTime, value, startTime, currentTime)
+	a.mb.RecordCPUTimeDataPoint(currentTime, value)
 }

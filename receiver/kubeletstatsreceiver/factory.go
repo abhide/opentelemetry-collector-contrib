@@ -28,6 +28,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8sconfig"
 	kube "github.com/open-telemetry/opentelemetry-collector-contrib/internal/kubelet"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver/internal/kubelet"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver/internal/metadata"
 )
 
 const (
@@ -60,6 +61,7 @@ func createDefaultConfig() config.Receiver {
 				AuthType: k8sconfig.AuthTypeTLS,
 			},
 		},
+		Metrics: metadata.DefaultMetricsSettings(),
 	}
 }
 

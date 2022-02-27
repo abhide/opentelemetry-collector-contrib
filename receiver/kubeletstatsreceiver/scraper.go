@@ -29,6 +29,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver/internal/kubelet"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver/internal/metadata"
 )
 
 type scraperOptions struct {
@@ -37,6 +38,7 @@ type scraperOptions struct {
 	extraMetadataLabels   []kubelet.MetadataLabel
 	metricGroupsToCollect map[kubelet.MetricGroup]bool
 	k8sAPIClient          kubernetes.Interface
+	metrics               metadata.Metrics
 }
 
 type kubletScraper struct {
@@ -47,6 +49,7 @@ type kubletScraper struct {
 	metricGroupsToCollect map[kubelet.MetricGroup]bool
 	k8sAPIClient          kubernetes.Interface
 	cachedVolumeLabels    map[string]map[string]string
+	mb                    *metadata.MetricsBuilder
 }
 
 func newKubletScraper(
@@ -62,6 +65,7 @@ func newKubletScraper(
 		metricGroupsToCollect: rOptions.metricGroupsToCollect,
 		k8sAPIClient:          rOptions.k8sAPIClient,
 		cachedVolumeLabels:    make(map[string]map[string]string),
+		mb:                    metadata.NewMetricsBuilder(rOptions.metrics),
 	}
 	return scraperhelper.NewScraper(typeStr, ks.scrape)
 }
@@ -84,7 +88,7 @@ func (r *kubletScraper) scrape(context.Context) (pdata.Metrics, error) {
 	}
 
 	metadata := kubelet.NewMetadata(r.extraMetadataLabels, podsMetadata, r.detailedPVCLabelsSetter())
-	mds := kubelet.MetricsData(r.logger, summary, metadata, typeStr, r.metricGroupsToCollect)
+	mds := kubelet.MetricsData(r.logger, summary, metadata, typeStr, r.metricGroupsToCollect, r.mb)
 	md := pdata.NewMetrics()
 	for i := range mds {
 		mds[i].ResourceMetrics().MoveAndAppendTo(md.ResourceMetrics())

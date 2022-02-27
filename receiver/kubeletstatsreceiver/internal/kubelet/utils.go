@@ -14,12 +14,7 @@
 
 package kubelet // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver/internal/kubelet"
 
-import (
-	"go.opentelemetry.io/collector/model/pdata"
-
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver/internal/metadata"
-)
-
+/*
 func fillDoubleGauge(dest pdata.Metric, prefix string, metricInt metadata.MetricIntf, value float64, currentTime pdata.Timestamp) {
 	metricInt.Init(dest)
 	dest.SetName(prefix + dest.Name())
@@ -50,4 +45,4 @@ func fillDoubleSum(dest pdata.Metric, prefix string, metricInt metadata.MetricIn
 	dp.SetDoubleVal(value)
 	dp.SetStartTimestamp(startTime)
 	dp.SetTimestamp(currentTime)
-}
+}*/
